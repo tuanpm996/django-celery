@@ -1,0 +1,117 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/style/style.css">
+    <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+    <style>
+      table, th, td {
+        border: 1px solid black;
+      }
+      .btn {
+          font-size: 10px;
+          margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="test" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Add Pages</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p>Add page here</p>
+            <input id="page_link">
+            <button id="add_page" class="btn-info">Add page</button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+
+      <div class="row">
+        <div class=col-md-2></div>
+        <div class=col-md-8>
+          <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#test">Add FanPage</button>
+          <table id="fanpage-table" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>FanPage</th>
+                  <th>Post</th>  
+                </tr>
+              </thead>
+              <tbody>
+                {% for fanpage in fanpages %}
+                  <tr>
+                    <td>
+                      {{fanpage.link}}
+                    </td>
+                    <td>
+                      <a class="btn btn-primary btn-get btn-lg" href="{{fanpage.id}}/get_promotion_posts" data-id="{{fanpage.id}}" role="button">Get Discount Posts</a>
+                      <a class="btn btn-success btn-lg" href="{{fanpage.id}}/posts" data-id="{{fanpage.id}}" role="button">Show all Posts</a>
+                      <a class="btn btn-danger btn-delete btn-lg" href="{{fanpage.id}}/delete_page" data-id="{{fanpage.id}}" role="button">Delete Fanpage</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>        
+      </div>
+    </div>
+  </body>
+  <script>    
+    $("body").delegate( ".btn-get", "click", function(e) {
+      e.preventDefault();
+      url = $(this).attr('data-id') + "/get_promotion_posts?daterange=" + $('input[name="daterange"]').val();
+      window.location.href = url;
+    });
+
+    $("body").delegate( ".btn-delete", "click", function(e) {
+      e.preventDefault();
+      url = $(this).attr('data-id') + "/delete_page";
+      window.location.href = url;
+    });
+
+    $("#add_page").click(function(){
+      var page_link_full = $("#page_link").val()
+      if (page_link_full.includes("facebook.com")) {
+        var page_link= $("#page_link").val().split('facebook.com/')[1]
+        $.ajax({
+          url: "/fanpages/addpage",
+          method: "GET",
+          type: "json",
+          data: {
+            page_link: page_link
+          },
+          success: function(msg) {
+            if(msg.status == "success"){
+              $("#test").modal('hide');
+              var content = "<tr><td>" + msg.fanpage_link + "</td><td><a class='btn btn-primary btn-get btn-lg' href='" + msg.fanpage_id + "/get_promotion_posts' data-id='" + msg.fanpage_id + "' role='button'>Get Promotion Posts</a>"
+                + "<a class='btn btn-success btn-lg' href='" + msg.fanpage_id + "/posts' data-id='" + msg.fanpage_id + " role='button'>Show all Posts</a>"
+                + "<a class='btn btn-danger btn-delete btn-lg' href=" + msg.fanpage_id + "'/delete_page' data-id='" + msg.fanpage_id + "' role='button'>Delete Fanpage</a>"
+                + "</td></tr>";
+              $("#fanpage-table tbody").append(content)
+              alert(msg.noti);
+            } else {
+              alert(msg.noti)
+            }
+          },
+          error: function() {
+          }
+        })
+      } else {
+        alert("It's not a facebook link");
+      }
+    });
+  </script>
+</html>

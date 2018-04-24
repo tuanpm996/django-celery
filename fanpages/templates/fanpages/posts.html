@@ -1,0 +1,96 @@
+<html>
+    <head>
+      <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+      <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+      <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+      <style>
+        table, th, td {
+          border: 1px solid black;
+        }
+        .btn {
+            font-size: 10px;
+            margin: 10px;
+        }
+        .post {
+          width: inherit;
+        }
+        .post .a {
+          visibility: hidden;
+          position: absolute;
+          background-color: #00ffdd;
+          display: inline-block;
+          padding: 10px;
+          border-radius: 10px;
+        }
+
+        .post:hover .a {
+          visibility: visible
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="row">
+          <div class=col-md-1></div>
+            <div class=col-md-10>
+              <a class="btn btn-xs btn-success" href="/fanpages/">Go to FanPage Page</a>
+              <table class="table tabel-striped table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th>Post</th>  
+                    <th>Link</th>  
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for post in posts %}
+                  <tr>
+                    <td>
+                      <div class="post">
+                          {{ post.message|truncatechars:50 }}
+                          <div class="a">
+                            {{ post.message }}
+                          </div>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="https:facebook.com/{{ post.fb_id }}">Link to post</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody> 
+              </table>
+              <div class="pagination">
+                <span class="step-links">
+                    {% if posts.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={{ posts.previous_page_number }}">previous</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                    </span>
+            
+                    {% if posts.has_next %}
+                        <a href="?page={{ posts.next_page_number }}">next</a>
+                        <a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+              </div>
+            </div>
+        </div>
+      </div>
+      {% comment %} <div class="container">
+        <div class="row">
+            <div class=col-md-1></div>
+            <div class=col-md-10>
+              <a href="/posts" class="btn btn-info btn-lg">posts</a>
+              Your request is being hanlded in the background...!
+            </div>
+        </div>
+      </div> {% endcomment %}
+    </body>
+</html>
